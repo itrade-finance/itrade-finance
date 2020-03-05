@@ -1,0 +1,17 @@
+{
+  "Trade.Intro": "Leverage collateral. Simple.",
+  "Trade.Connect": "Connect wallet",
+  "Trade.Trade": "Open position",
+  "Trade.IHave": "Deposit Collateral",
+  "Trade.IWillReceive": "Receive Position",
+  "Trade.Leverage": "Pick your leverage",
+
+  "Home.Margin": "Margin Trade",
+  "Home.Positions": "My Positions",
+
+  "Footer.Home": "Margin",
+  "Footer.About": "about",
+  "Footer.Docs": "docs",
+  "Footer.Code": "code",
+  "Footer.Telegram": "telegram"
+}
