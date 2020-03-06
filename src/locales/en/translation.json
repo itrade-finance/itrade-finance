@@ -8,10 +8,15 @@
 
   "Home.Margin": "Margin Trade",
   "Home.Positions": "My Positions",
+  "Home.Debt": "Manage Debt",
 
-  "Footer.Home": "Margin",
-  "Footer.About": "about",
-  "Footer.Docs": "docs",
-  "Footer.Code": "code",
-  "Footer.Telegram": "telegram"
+  "Unlock.WalletConnected": "Wallet connected",
+
+  "Footer.Home": "Home",
+
+  "Snackbar.Error": "Error",
+  "Snackbar.Warning": "Warning",
+  "Snackbar.Info": "Info",
+  "Snackbar.Succecss": "Success",
+  "Snackbar.Hash": "Hash"
 }

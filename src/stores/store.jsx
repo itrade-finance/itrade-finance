@@ -4,7 +4,11 @@ import async from 'async';
 import {
   ERROR,
   GET_BALANCES,
-  BALANCES_RETURNED
+  BALANCES_RETURNED,
+  TRADE,
+  TRADE_RETURNED,
+  GET_TRADES,
+  TRADES_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -45,15 +49,31 @@ class Store {
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           decimals: 18,
           balance: 0,
-        }
-      ],
-      receiveOptions: [
+        },
         {
-          id: 'fBTC',
-          symbol: 'BTC',
-          name: 'Bitcoin',
-          description: 'Bitcoin',
-          erc20address: '',
+          id: 'usdt',
+          symbol: 'USDT',
+          name: 'USDT',
+          description: 'Tether USD',
+          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          decimals: 6,
+          balance: 0,
+        },
+        {
+          id: 'usdc',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          description: 'USD//C',
+          erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          decimals: 6,
+          balance: 0,
+        },
+        {
+          id: 'busd',
+          symbol: 'BUSD',
+          name: 'BUSD',
+          description: 'Binance USD',
+          erc20address: '0x4fabb145d64652a948d72533023f6e7a623c7c53',
           decimals: 18,
           balance: 0,
         }
@@ -97,6 +117,12 @@ class Store {
         switch (payload.type) {
           case GET_BALANCES:
             this.getBalances(payload)
+            break;
+          case TRADE:
+            this.trade(payload)
+            break;
+          case GET_TRADES:
+            this.getTrades(payload)
             break;
           default: {
           }
@@ -147,7 +173,7 @@ class Store {
 
   getBalances = async () => {
     const account = store.getStore('account')
-    const assets = store.getStore('assets')
+    const assets = store.getStore('collateralOptions')
 
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
@@ -180,6 +206,72 @@ class Store {
       console.log(ex)
       return callback(ex)
     }
+  }
+
+  trade = (payload) => {
+    const account = store.getStore('account')
+    const { collateralAsset, receiveAsset, collateralAmount, leverage } = payload.content
+
+    this._checkApproval(collateralAsset, account, collateralAmount, config.traderContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+      this._callITrade(collateralAsset, receiveAsset, account, collateralAmount, leverage, (err, tradeResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(TRADE_RETURNED, tradeResult)
+      })
+    })
+  }
+
+  _callITrade = async (collateralAsset, receiveAsset, account, amount, leverage, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const collateralContract = new web3.eth.Contract(config.traderContractABI, config.traderContractAddress)
+
+    var amountToSend = (amount*10**collateralAsset.decimals) + ''
+    var amountToReceive = (amount*leverage*10**receiveAsset.decimals) + ''
+
+    console.log(account.address)
+    console.log(collateralAsset.erc20address)
+    console.log(receiveAsset.erc20address)
+    console.log(amountToSend)
+    console.log(amountToReceive)
+    console.log(leverage)
+
+    collateralContract.methods.addCollateral(collateralAsset.erc20address, receiveAsset.erc20address, amountToSend, amountToReceive, leverage).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  getTrades = (payload) => {
+
   }
 }
 

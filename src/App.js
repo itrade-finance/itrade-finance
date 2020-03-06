@@ -38,6 +38,9 @@ class App extends Component {
               <Route path="/positions">
                 <Positions />
               </Route>
+              <Route path="/debt">
+                <Positions />
+              </Route>
               <Route path="/">
                 <Home />
               </Route>

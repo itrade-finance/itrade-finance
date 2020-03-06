@@ -19,7 +19,9 @@ import {
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
   TRADE,
-  TRADE_RETURNED
+  TRADE_RETURNED,
+  GET_BALANCES,
+  BALANCES_RETURNED,
 } from '../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -159,8 +161,11 @@ class Trade extends Component {
       collateralAmount: '',
       receiveAmount: '',
       receiveAsset: null,
-      receiveOptions: store.getStore('receiveOptions'),
-      leverage: 1
+      leverage: 100
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_BALANCES, content: {} })
     }
   }
 
@@ -169,6 +174,7 @@ class Trade extends Component {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(TRADE_RETURNED, this.tradeReturned);
+    emitter.on(BALANCES_RETURNED, this.balancesReturned);
   }
 
   componentWillUnmount() {
@@ -176,18 +182,39 @@ class Trade extends Component {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(TRADE_RETURNED, this.tradeReturned);
+    emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
 
-  tradeReturned = () => {
-
+  tradeReturned = (txHash) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState({ snackbarObj: snackbarObj, loading: false, collateralAmount: '', collateralAsset: null, receiveAsset: null })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      that.setState(snackbarObj)
+    })
   };
 
   connectionConnected = () => {
+    const { t } = this.props
+
     this.setState({ account: store.getStore('account') })
+
+    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
   };
 
   connectionDisconnected = () => {
     this.setState({ account: store.getStore('account') })
+  };
+
+  balancesReturned = (balances) => {
+    this.setState({ collateralOptions: store.getStore('collateralOptions') })
   };
 
   errorReturned = (error) => {
@@ -209,7 +236,6 @@ class Trade extends Component {
       collateralOptions,
       collateralAsset,
       collateralAmount,
-      receiveOptions,
       receiveAsset,
       receiveAmount,
       leverage,
@@ -258,7 +284,7 @@ class Trade extends Component {
               <div className={ classes.sepperator }></div>
               <Leverage loading={ loading } leverage={ leverage } setLeverage={ this.setLeverage }/>
               <div className={ classes.sepperator }></div>
-              <Want receiveOptions={ receiveOptions } setReceiveAsset={ this.setReceiveAsset } receiveAsset={ receiveAsset } receiveAmount={ receiveAmount } loading={ loading } />
+              <Want receiveOptions={ collateralOptions } setReceiveAsset={ this.setReceiveAsset } receiveAsset={ receiveAsset } receiveAmount={ receiveAmount } loading={ loading } />
               <div className={ classes.sepperator }></div>
               <Button
                 className={ classes.actionButton }

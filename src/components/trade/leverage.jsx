@@ -27,29 +27,23 @@ class Leverage extends Component {
   constructor() {
     super()
 
-    this.state = {
-      value: 1
-    }
   }
 
   render() {
-    const { classes, t } = this.props;
-    const {
-      value,
-    } = this.state
+    const { classes, t, leverage } = this.props;
 
     return (
       <div className={ classes.root }>
         <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Trade.Leverage") }</Typography>
-        <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
-          <ToggleButton value={0} aria-label="v1">
-            <Typography variant={ 'h3' }>2X</Typography>
+        <ToggleButtonGroup value={ leverage } onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
+          <ToggleButton value={75} aria-label="v3">
+            <Typography variant={ 'h3' }>75X</Typography>
           </ToggleButton>
-          <ToggleButton value={1} aria-label="v2">
-            <Typography variant={ 'h3' }>5X</Typography>
+          <ToggleButton value={100} aria-label="v3">
+            <Typography variant={ 'h3' }>100X</Typography>
           </ToggleButton>
-          <ToggleButton value={2} aria-label="v3">
-            <Typography variant={ 'h3' }>10X</Typography>
+          <ToggleButton value={1000} aria-label="v3">
+            <Typography variant={ 'h3' }>1000X</Typography>
           </ToggleButton>
         </ToggleButtonGroup>
       </div>
@@ -57,7 +51,7 @@ class Leverage extends Component {
   };
 
   handleTabChange = (event, newValue) => {
-    this.setState({value:newValue})
+    this.props.setLeverage( newValue )
   };
 }
 
