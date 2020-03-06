@@ -186,8 +186,7 @@ class Trade extends Component {
   };
 
   tradeReturned = (txHash) => {
-    const snackbarObj = { snackbarMessage: null, snackbarType: null }
-    this.setState({ snackbarObj: snackbarObj, loading: false, collateralAmount: '', collateralAsset: null, receiveAsset: null })
+    this.setState({ snackbarMessage: null, snackbarType: null, loading: false, collateralAmount: '', collateralAsset: null, receiveAsset: null })
     const that = this
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
@@ -218,9 +217,7 @@ class Trade extends Component {
   };
 
   errorReturned = (error) => {
-    const snackbarObj = { snackbarMessage: null, snackbarType: null }
-    this.setState(snackbarObj)
-    this.setState({ loading: false })
+    this.setState({ snackbarMessage: null, snackbarType: null, loading: false })
     const that = this
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }

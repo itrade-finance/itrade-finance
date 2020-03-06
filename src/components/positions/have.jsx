@@ -118,10 +118,10 @@ class Have extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
-          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Trade.IHave") }</Typography>
+          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Position.IHave") }</Typography>
           <div className={ classes.tradeContainer }>
             { collateralAsset && <div className={ classes.balances }>
-                <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.props.setCollateralAmountPercent(100) } } className={ classes.value } noWrap>{ 'Balance: '+ ( collateralAsset.balance ? collateralAsset.balance.toFixed(4) : '0.0000') } { collateralAsset.symbol }</Typography>
+                <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.props.setCollateralAmountPercent(100) } } className={ classes.value } noWrap>{ 'Position: '+ ( collateralAsset.position ? collateralAsset.position.toFixed(4) : '0.0000') } { collateralAsset.symbol }</Typography>
             </div> }
             { this.renderAssetSelect('asset', asset, assetOptions, assetError) }
           </div>

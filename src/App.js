@@ -12,6 +12,7 @@ import tradeTheme from './theme';
 
 import Trade from './components/trade';
 import Positions from './components/positions';
+import Debt from './components/debt';
 import Footer from './components/footer';
 import Home from './components/home';
 
@@ -32,14 +33,14 @@ class App extends Component {
           }}>
             <Footer />
             <Switch>
-              <Route path="/margin">
+              <Route path="/open">
                 <Trade />
               </Route>
-              <Route path="/positions">
+              <Route path="/trade">
                 <Positions />
               </Route>
-              <Route path="/debt">
-                <Positions />
+              <Route path="/manage">
+                <Debt />
               </Route>
               <Route path="/">
                 <Home />

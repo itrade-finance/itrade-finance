@@ -1,14 +1,31 @@
 {
-  "Trade.Intro": "Leverage collateral. Simple.",
+  "Trade.Intro": "Open Position. Simple.",
   "Trade.Connect": "Connect wallet",
   "Trade.Trade": "Open position",
   "Trade.IHave": "Deposit Collateral",
   "Trade.IWillReceive": "Receive Position",
   "Trade.Leverage": "Pick your leverage",
 
-  "Home.Margin": "Margin Trade",
-  "Home.Positions": "My Positions",
-  "Home.Debt": "Manage Debt",
+  "Home.Margin": "Open Position",
+  "Home.Positions": "Trade Positions",
+  "Home.Debt": "Manage Positions",
+
+  "Debt.Intro": "Manage Positions. Simple.",
+  "Debt.Connect": "Connect wallet",
+  "Debt.Principal": "Principal",
+  "Debt.Debt": "Debt",
+  "Debt.Position": "Position",
+
+  "Position.Intro": "Trade Position. Simple.",
+  "Position.Connect": "Connect wallet",
+  "Position.Trade": "Trade position",
+  "Position.IHave": "Send Position",
+  "Position.IWillReceive": "Receive Position",
+
+  "Asset.ClosePosition":  "Close Position",
+  "Asset.ExitPosition":  "Exit Position",
+  "Asset.RepayDebt":  "Repay Debt",
+  "Asset.WithdrawPrincipal": "Withdraw Principal",
 
   "Unlock.WalletConnected": "Wallet connected",
 

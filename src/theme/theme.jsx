@@ -191,9 +191,9 @@ const iswapTheme =  {
     },
     MuiExpansionPanelDetails: {
       root: {
-        padding: '0 12px 0 12px',
+        padding: '0 0px 0 0px',
         '@media (min-width: 960px)': {
-          padding: '0 24px 0 24px',
+          padding: '0 0px 0 0px',
         }
       }
     },

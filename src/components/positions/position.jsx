@@ -7,7 +7,8 @@ import {
   Button
 } from '@material-ui/core';
 
-import Table from './table'
+import Have from './have'
+import Want from './want'
 import Loader from '../loader'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
@@ -16,8 +17,10 @@ import {
   ERROR,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
-  GET_TRADES,
-  TRADES_RETURNED
+  TRADE_POSITION,
+  TRADE_POSITION_RETURNED,
+  GET_DEBT_BALANCES,
+  DEBT_BALANCES_RETURNED
 } from '../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -42,8 +45,7 @@ const styles = theme => ({
     flexWrap: 'wrap',
     padding: '12px',
     borderRadius: '1.25em',
-    maxWidth: '800px',
-    width: '100%',
+    maxWidth: '400px',
     justifyContent: 'center',
     marginTop: '20px',
     [theme.breakpoints.up('md')]: {
@@ -54,7 +56,7 @@ const styles = theme => ({
     width: '100%',
     display: 'flex',
     flexWrap: 'wrap',
-    maxWidth: '800px',
+    maxWidth: '400px',
     justifyContent: 'center',
     padding: '12px',
     minWidth: '100%',
@@ -67,7 +69,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    maxWidth: '800px'
+    maxWidth: '400px'
   },
   introCenter: {
     minWidth: '100%',
@@ -144,7 +146,7 @@ const styles = theme => ({
   },
 });
 
-class Positions extends Component {
+class Position extends Component {
 
   constructor() {
     super()
@@ -153,7 +155,15 @@ class Positions extends Component {
 
     this.state = {
       account: account,
-      trades: store.getStore('trades')
+      collateralOptions: store.getStore('collateralOptions'),
+      collateralAsset: null,
+      collateralAmount: '',
+      receiveAmount: '',
+      receiveAsset: null
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_DEBT_BALANCES, content: {} })
     }
   }
 
@@ -161,32 +171,51 @@ class Positions extends Component {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.on(TRADES_RETURNED, this.tradesReturned);
+    emitter.on(TRADE_POSITION_RETURNED, this.tradeReturned);
+    emitter.on(DEBT_BALANCES_RETURNED, this.debtReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.removeListener(TRADES_RETURNED, this.tradesReturned);
+    emitter.removeListener(TRADE_POSITION_RETURNED, this.tradeReturned);
+    emitter.removeListener(DEBT_BALANCES_RETURNED, this.debtReturned);
   };
 
-  tradesReturned = () => {
-    this.setState({ trades: store.getStore('trades') })
+  tradeReturned = (txHash) => {
+    this.setState({ snackbarMessage: null, snackbarType: null, loading: false, collateralAmount: '', collateralAsset: null, receiveAsset: null })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      that.setState(snackbarObj)
+    })
   };
 
   connectionConnected = () => {
+    const { t } = this.props
+
     this.setState({ account: store.getStore('account') })
+
+    dispatcher.dispatch({ type: GET_DEBT_BALANCES, content: {} })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
   };
 
   connectionDisconnected = () => {
     this.setState({ account: store.getStore('account') })
   };
 
+  debtReturned = (balances) => {
+    this.setState({ collateralOptions: store.getStore('collateralOptions') })
+  };
+
   errorReturned = (error) => {
-    const snackbarObj = { snackbarMessage: null, snackbarType: null }
-    this.setState(snackbarObj)
-    this.setState({ loading: false })
+    this.setState({ snackbarMessage: null, snackbarType: null, loading: false })
     const that = this
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }
@@ -199,6 +228,11 @@ class Positions extends Component {
     const {
       account,
       loading,
+      collateralOptions,
+      collateralAsset,
+      collateralAmount,
+      receiveAsset,
+      receiveAmount,
       modalOpen,
       snackbarMessage,
     } = this.state
@@ -214,7 +248,7 @@ class Positions extends Component {
           <div className={ classes.notConnectedContainer }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('Trade.Intro') }</Typography>
+              <Typography variant='h2'>{ t('Position.Intro') }</Typography>
             </div>
             <div className={ classes.connectContainer }>
               <Button
@@ -224,7 +258,7 @@ class Positions extends Component {
                 disabled={ loading }
                 onClick={ this.overlayClicked }
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('Trade.Connect') }</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('Position.Connect') }</Typography>
               </Button>
             </div>
           </div>
@@ -233,13 +267,28 @@ class Positions extends Component {
           <div className={ classes.card }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.intro }>
-              <Typography variant='h2' className={ classes.introText }>{ t('Trade.Intro') }</Typography>
+              <Typography variant='h2' className={ classes.introText }>{ t('Position.Intro') }</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
               </Card>
             </div>
-            <Table />
+            <Card className={ classes.tradeContainer }>
+              <Have collateralOptions={ collateralOptions } setCollateralAsset={ this.setCollateralAsset } collateralAsset={ collateralAsset } collateralAmount={ collateralAmount } setCollateralAmount={ this.setCollateralAmount } setCollateralAmountPercent={ this.setCollateralAmountPercent } loading={ loading } />
+              <div className={ classes.sepperator }></div>
+              <Want receiveOptions={ collateralOptions } setReceiveAsset={ this.setReceiveAsset } receiveAsset={ receiveAsset } receiveAmount={ receiveAmount } loading={ loading } />
+              <div className={ classes.sepperator }></div>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading }
+                onClick={ this.onTrade }
+                fullWidth
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Position.Trade') }</Typography>
+              </Button>
+            </Card>
           </div>
         }
         { modalOpen && this.renderModal() }
@@ -248,6 +297,42 @@ class Positions extends Component {
       </div>
     )
   };
+
+  onTrade = () => {
+    this.setState({ collateralAmountError: false })
+
+    const { collateralAsset, collateralAmount, receiveAsset } = this.state
+
+    if(!collateralAmount || isNaN(collateralAmount) || collateralAmount <= 0 || parseFloat(collateralAmount) > collateralAsset.position) {
+      this.setState({ collateralAmountError: true })
+      return false
+    }
+
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: TRADE_POSITION, content: { collateralAsset: collateralAsset, collateralAmount: collateralAmount, receiveAsset: receiveAsset } })
+  }
+
+  setReceiveAsset = (asset) => {
+    this.setState({ receiveAsset: asset })
+  }
+
+  setCollateralAsset = (asset) => {
+    this.setState({ collateralAsset: asset })
+  }
+
+  setCollateralAmount = (amount) => {
+    this.setState({ collateralAmount: amount })
+  }
+
+  setCollateralAmountPercent = (percent) => {
+    const { collateralAsset } = this.state
+
+    const position = collateralAsset.position
+    let collateralAmount = position*percent/100
+
+    collateralAmount = Math.floor(collateralAmount*10000)/10000;
+    this.setState({ collateralAmount: collateralAmount.toFixed(4) })
+  }
 
   renderModal = () => {
     return (
@@ -272,4 +357,4 @@ class Positions extends Component {
   }
 }
 
-export default withNamespaces()(withRouter(withStyles(styles)(Positions)));
+export default withNamespaces()(withRouter(withStyles(styles)(Position)));
