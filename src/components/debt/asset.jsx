@@ -257,7 +257,7 @@ class Asset extends Component {
       <div className={ classes.sepperator }></div>
       <div className={classes.tradeContainer}>
         <div className={ classes.balances }>
-          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setDebtAmount(100) } } className={ classes.value } noWrap>{ 'Debt: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.symbol }</Typography>
+          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setDebtAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.symbol }</Typography>
         </div>
         <div className={ classes.amountContainer }>
           <TextField
@@ -320,7 +320,7 @@ class Asset extends Component {
       <div className={ classes.sepperator }></div>
       <div className={ classes.tradeContainer }>
         <div className={ classes.balances }>
-          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setPositionAmount(100) } } className={ classes.value } noWrap>{ 'Debt: '+ (asset.position ? asset.position.toFixed(4) : '0.0000') } { asset.symbol }</Typography>
+          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setPositionAmount(100) } } className={ classes.value } noWrap>{ 'Position: '+ (asset.position ? asset.position.toFixed(4) : '0.0000') } { asset.symbol }</Typography>
         </div>
         <div className={ classes.amountContainer }>
           <TextField
@@ -425,7 +425,7 @@ class Asset extends Component {
     const { debtAmount } = this.state
     const { asset, startLoading } = this.props
 
-    if(!debtAmount || isNaN(debtAmount) || debtAmount <= 0 || debtAmount > asset.debt) {
+    if(!debtAmount || isNaN(debtAmount) || debtAmount <= 0 || debtAmount > asset.balance) {
       this.setState({ debtAmountError: true })
       return false
     }
@@ -452,13 +452,13 @@ class Asset extends Component {
   }
 
   onClosePosition = () => {
-    this.setState({ principalAmountError: false })
+    this.setState({ positionAmountError: false })
 
     const { positionAmount } = this.state
     const { asset, startLoading  } = this.props
 
     if(!positionAmount || isNaN(positionAmount) || positionAmount <= 0 || positionAmount > asset.position) {
-      this.setState({ principalAmountError: true })
+      this.setState({ positionAmountError: true })
       return false
     }
 

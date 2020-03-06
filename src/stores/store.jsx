@@ -555,7 +555,7 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    this._callClose(asset, account, amount, (err, res) => {
+    this._callClosePosition(asset, account, amount, (err, res) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
@@ -570,6 +570,9 @@ class Store {
     const collateralContract = new web3.eth.Contract(config.traderContractABI, config.traderContractAddress)
 
     var amountToSend = (amount*10**asset.decimals) + ''
+
+    console.log(asset.erc20address)
+    console.log(amountToSend)
 
     collateralContract.methods.closePosition(asset.erc20address, amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
