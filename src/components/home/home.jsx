@@ -7,11 +7,9 @@ import {
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
-import FlashOnIcon from '@material-ui/icons/FlashOn';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import SecurityIcon from '@material-ui/icons/Security';
-import BarChartIcon from '@material-ui/icons/BarChart';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import MoneyOffIcon from '@material-ui/icons/MoneyOff';
 
 const styles = theme => ({
   root: {
@@ -151,13 +149,17 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'margin') } }>
+        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'open') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Margin") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'positions') } }>
+        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'trade') } }>
           <TrendingUpIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Positions") }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'manage') } }>
+          <MoneyOffIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Debt") }</Typography>
         </Card>
       </div>
     )

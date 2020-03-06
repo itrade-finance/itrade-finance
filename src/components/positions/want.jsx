@@ -81,7 +81,7 @@ class Want extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
-          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Trade.IWillReceive") }</Typography>
+          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Position.IWillReceive") }</Typography>
           { this.renderAssetSelect('asset', asset, assetOptions, null) }
         </div>
       </div>
